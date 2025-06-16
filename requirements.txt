@@ -1,3 +1,2 @@
 quart
-httpx
 gunicorn
