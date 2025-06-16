@@ -25,12 +25,12 @@ async def stripe_raw():
         "speed_mode": "slow"
     }
 
-    async with httpx.AsyncClient(timeout=20) as client:
-        try:
+    try:
+        async with httpx.AsyncClient(timeout=20) as client:
             r = await client.post("https://shinobaby.shino.wtf/stripe", json=postData)
-            resp = r.json()
-        except Exception as e:
-            return jsonify({"error": "API POST error", "detail": str(e)}), 500
+            resp = await r.json()
+    except Exception as e:
+        return jsonify({"error": "API POST error", "detail": str(e)}), 500
 
     if resp.get("status") == "processing":
         status_url = "https://shinobaby.shino.wtf" + resp["check_status_url"]
@@ -39,7 +39,7 @@ async def stripe_raw():
             try:
                 async with httpx.AsyncClient(timeout=20) as client:
                     poll = await client.get(status_url)
-                    result = poll.json()
+                    result = await poll.json()
             except Exception as e:
                 return jsonify({"error": "API polling error", "detail": str(e)}), 500
 
